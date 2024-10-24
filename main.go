@@ -4,46 +4,33 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
-	"sync"
+	"regexp"
+	"strings"
 
 	"github.com/gocolly/colly"
 )
 
 type Site struct {
-	Url      string `json:"name"`
-	Title    string `json:"title"`
-	BodyText string `json:"bodytext"`
+	Url      string   `json:"name"`
+	Title    string   `json:"title"`
+	BodyText string   `json:"bodytext"`
+	Tags     []string `json:"tags"`
 }
 
-// scraping functions
-func scrape(url string, wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	//Initialize Scraper
-	c := colly.NewCollector(
-		// Visit only domains: en.wikipedia.org
-		colly.AllowedDomains("en.wikipedia.org"),
-	)
-
-	// Before making a request print "Visiting ..."
-	c.OnRequest(func(r *colly.Request) {
-		fmt.Println("visiting", r.URL.String())
-	})
-
-	//Find the tile of the Wiki Page
-	c.OnHTML(".mw-page-title-main", func(e *colly.HTMLElement) {
-		fmt.Println(e.Text)
-	})
-	// mw-content-text
-	c.OnHTML(".mw-body-content", func(e *colly.HTMLElement) {
-		fmt.Println(e.Text)
-	})
-	// c.OnHTML(".searchaux", func(e *colly.HTMLElement) {
-	// 	fmt.Println(e.Text)
-	// })
-
-	c.Visit(url)
+// Function to remove stopwords
+func removeStopwords(words []string) []string {
+	stopwords := map[string]bool{
+		"and": true, "the": true, "is": true, "in": true, "of": true, "a": true, "an": true, // Add more stopwords as needed
+	}
+	var result []string
+	for _, word := range words {
+		if !stopwords[word] {
+			result = append(result, word)
+		}
+	}
+	return result
 }
 
 func main() {
@@ -73,11 +60,11 @@ func main() {
 	//Initialize slice of courses
 	sites := make([]Site, 0, 100)
 
-	for _, url := range urls {
+	for _, URL := range urls {
 
 		//Create Empty struct targetSite
 		var targetSite Site
-		targetSite.Url = url
+		targetSite.Url = URL
 
 		//Initialize Scraper
 		c := colly.NewCollector(
@@ -94,12 +81,39 @@ func main() {
 		c.OnHTML(".mw-page-title-main", func(e *colly.HTMLElement) {
 			targetSite.Title = e.Text
 		})
-		// mw-content-text
+		// Grab Body Text
 		c.OnHTML(".mw-body-content", func(e *colly.HTMLElement) {
 			targetSite.BodyText = e.Text
 		})
 
-		c.Visit(url)
+		//Parse URL
+		parsedURL, err := url.Parse(URL)
+		if err != nil {
+			fmt.Println("Error parsing URL:", err)
+			return
+		}
+		// Split the URL path into segments
+		pathSegments := strings.Split(parsedURL.Path, "/")
+
+		// Initial tags list from URL segments
+		tagsList := []string{pathSegments[1], pathSegments[2]}
+
+		var moreTags []string
+		// Generate more tags
+
+		urlPart := pathSegments[2]
+		words := strings.Split(urlPart, "_")
+		moreTags = removeStopwords(words)
+
+		// Clean and add more tags
+		re := regexp.MustCompile(`[^a-zA-Z]`)
+		for _, tag := range moreTags {
+			cleanedTag := re.ReplaceAllString(tag, "")
+			tagsList = append(tagsList, strings.ToLower(cleanedTag))
+		}
+		targetSite.Tags = tagsList
+
+		c.Visit(URL)
 		sites = append(sites, targetSite)
 	}
 
