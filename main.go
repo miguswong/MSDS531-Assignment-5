@@ -58,7 +58,7 @@ func main() {
 		"https://en.wikipedia.org/wiki/Android_(robot)",
 	}
 	//Initialize slice of courses
-	sites := make([]Site, 0, 100)
+	sites := make([]Site, 0, 500)
 
 	for _, URL := range urls {
 
