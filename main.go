@@ -12,6 +12,7 @@ import (
 	"github.com/gocolly/colly"
 )
 
+// Initialize struct to hold wiki data
 type Site struct {
 	Url      string   `json:"name"`
 	Title    string   `json:"title"`
@@ -19,7 +20,7 @@ type Site struct {
 	Tags     []string `json:"tags"`
 }
 
-// Function to remove stopwords
+// Function to remove stopwords, returns list of strings with stopwords removed
 func removeStopwords(words []string) []string {
 	stopwords := map[string]bool{
 		"and": true, "the": true, "is": true, "in": true, "of": true, "a": true, "an": true, // Add more stopwords as needed
@@ -57,9 +58,11 @@ func main() {
 		"https://en.wikipedia.org/wiki/Applications_of_artificial_intelligence",
 		"https://en.wikipedia.org/wiki/Android_(robot)",
 	}
-	//Initialize slice of courses
+
+	//Initialize Site slice called sites
 	sites := make([]Site, 0, 500)
 
+	//Iterate through URL list and collect data
 	for _, URL := range urls {
 
 		//Create Empty struct targetSite
