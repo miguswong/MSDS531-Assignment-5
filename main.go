@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/gocolly/colly"
 )
@@ -95,6 +96,7 @@ func Scrape(URL string, wg *sync.WaitGroup, sites *[]Site) {
 
 func main() {
 	var wg sync.WaitGroup
+	start := time.Now()
 	//Initialize item.json file
 	fName := "item.jl"
 	file, err := os.Create(fName)
@@ -133,4 +135,6 @@ func main() {
 	enc.SetIndent("", "  ")
 
 	enc.Encode(sites)
+	elapsed := time.Since(start)
+	fmt.Printf("Execution took %s\n", elapsed)
 }
