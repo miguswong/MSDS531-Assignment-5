@@ -45,7 +45,7 @@ The following slice of strings was what was used to build the web scraper:
 	}
 ```
 
-If you would like to scrape other websites, the *urls* variable will need to be directly edited in main.go and recompiled.
+If you would like to scrape other websites, the *urls* variable will need to be directly edited in main.go and recompiled. All ouputs are saved to the executable's current directory and will be named "item.jl". Please reference [item.jl](https://github.com/miguswong/MSDS531-Assignment-5/blob/main/item.jl) for an example of the expected output.
 
 ## Testing
 Unit testing was employed via Go's standard testing library to mainy test scraping functionality, ability to remove stopwords from any tags identified. 
