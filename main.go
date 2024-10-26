@@ -59,8 +59,8 @@ func Scrape(URL string, wg *sync.WaitGroup, sites *[]Site) {
 		targetSite.Title = e.Text
 	})
 	// Grab Body Text
-	c.OnHTML(".mw-body-content", func(e *colly.HTMLElement) {
-		targetSite.BodyText = e.Text
+	c.OnHTML("#mw-content-text", func(e *colly.HTMLElement) {
+		targetSite.BodyText += e.Text
 	})
 
 	//Parse URL
@@ -131,10 +131,21 @@ func main() {
 
 	//
 	wg.Wait()
-	enc := json.NewEncoder(file)
-	enc.SetIndent("", "  ")
 
-	enc.Encode(sites)
+	//Write Struct Data to jsonl file
+	for _, site := range sites {
+		jsonData, err := json.Marshal(site)
+		if err != nil {
+			fmt.Println("Error marsahlling JSON: ", err)
+			return
+		}
+		_, err = file.WriteString(string(jsonData) + "\n")
+		if err != nil {
+			fmt.Println("Error writing to file:", err)
+			return
+		}
+	}
+
 	elapsed := time.Since(start)
 	fmt.Printf("Execution took %s\n", elapsed)
 }
