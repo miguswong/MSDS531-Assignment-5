@@ -27,7 +27,25 @@ This web scraper was mainly built on functionality from
 
 Colly extracts the text for each field based off html ids and classes and returns the respective text for each field in the format of a json lines file. Outputs were validated through the use of https://jsonlines.org/validator/.
 
+### Using the Scraper
+The following slice of strings was what was used to build the web scraper:
 
+```go
+	urls := []string{
+		"https://en.wikipedia.org/wiki/Robotics",
+		"https://en.wikipedia.org/wiki/Robot",
+		"https://en.wikipedia.org/wiki/Reinforcement_learning",
+		"https://en.wikipedia.org/wiki/Robot_Operating_System",
+		"https://en.wikipedia.org/wiki/Intelligent_agent",
+		"https://en.wikipedia.org/wiki/Software_agent",
+		"https://en.wikipedia.org/wiki/Robotic_process_automation",
+		"https://en.wikipedia.org/wiki/Chatbot",
+		"https://en.wikipedia.org/wiki/Applications_of_artificial_intelligence",
+		"https://en.wikipedia.org/wiki/Android_(robot)",
+	}
+```
+
+If you would like to scrape other websites, the *urls* variable will need to be directly edited in main.go and recompiled.
 
 ## Testing
 Unit testing was employed via Go's standard testing library to mainy test scraping functionality, ability to remove stopwords from any tags identified. 
